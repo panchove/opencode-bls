@@ -8,6 +8,15 @@
     "type": "git",
     "url": "https://github.com/panchove/opencode-bls"
   },
+  "homepage": "https://github.com/panchove/opencode-bls#readme",
+  "bugs": {
+    "url": "https://github.com/panchove/opencode-bls/issues"
+  },
+  "author": {
+    "name": "Francisco Prado",
+    "email": "fpradove@gmail.com",
+    "url": "https://github.com/panchove"
+  },
   "license": "MIT",
   "icon": "images/icon.png",
   "galleryBanner": {

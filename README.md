@@ -114,3 +114,12 @@ opencode-bls/
 ├── package.json         # Extension manifest
 └── tsconfig.json        # TypeScript configuration
 ```
+
+---
+
+## 👤 Author
+
+**Francisco Prado** (Venezuela 🇻🇪)
+- GitHub: [@panchove](https://github.com/panchove)
+- Email: [fpradove@gmail.com](mailto:fpradove@gmail.com)
+
