@@ -78,7 +78,12 @@ async function getBinaryDetails(binPath: string): Promise<OpenCodeBinaryInfo> {
     const { stdout } = await execAsync(`"${binPath}" --version`, { timeout: 3000 });
     versionStr = stdout.trim();
     if (versionStr) {
-      isV2 = versionStr.includes("v2.") || versionStr.includes("2.");
+      const match = versionStr.match(/v?(\d+)\./);
+      if (match) {
+        isV2 = parseInt(match[1], 10) >= 2;
+      } else {
+        isV2 = versionStr.includes("2.");
+      }
     }
   } catch {
     // Fallback default

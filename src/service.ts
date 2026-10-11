@@ -17,7 +17,7 @@ export class OpenCodeServiceManager {
     }
 
     const binInfo = await resolveOpenCodeBinary();
-    if (!binInfo) {
+    if (!binInfo || !binInfo.isV2) {
       return null;
     }
 
@@ -41,6 +41,18 @@ export class OpenCodeServiceManager {
     const binInfo = await resolveOpenCodeBinary();
     if (!binInfo) {
       vscode.window.showErrorMessage("OpenCode: Executable not found.");
+      return null;
+    }
+
+    if (!binInfo.isV2) {
+      const action = await vscode.window.showWarningMessage(
+        `OpenCode daemon service requires OpenCode v2.x (detected ${binInfo.version || "v1.x"}). Please upgrade to use this feature.`,
+        "Upgrade Guide",
+        "Dismiss"
+      );
+      if (action === "Upgrade Guide") {
+        vscode.env.openExternal(vscode.Uri.parse("https://opencode.ai"));
+      }
       return null;
     }
 
@@ -68,6 +80,19 @@ export class OpenCodeServiceManager {
    * Opens the Web UI dashboard for OpenCode v2.
    */
   public async openWebUI(): Promise<void> {
+    const binInfo = await resolveOpenCodeBinary();
+    if (binInfo && !binInfo.isV2) {
+      const action = await vscode.window.showWarningMessage(
+        `OpenCode Web UI requires OpenCode v2.x (detected ${binInfo.version || "v1.x"}). Please upgrade to use this feature.`,
+        "Upgrade Guide",
+        "Dismiss"
+      );
+      if (action === "Upgrade Guide") {
+        vscode.env.openExternal(vscode.Uri.parse("https://opencode.ai"));
+      }
+      return;
+    }
+
     let url = await this.getServiceUrl();
 
     if (!url) {
