@@ -2,7 +2,7 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Ejecutar Extensión (F5)",
+      "name": "Launch Extension (F5)",
       "type": "extensionDevelopmentHost",
       "request": "launch",
       "runtimeExecutable": "/home/panchove/Escritorio/Antigravity IDE/antigravity-ide",

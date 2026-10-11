@@ -40,24 +40,24 @@ export class OpenCodeServiceManager {
   public async startService(): Promise<string | null> {
     const binInfo = await resolveOpenCodeBinary();
     if (!binInfo) {
-      vscode.window.showErrorMessage("OpenCode: No se encontró el ejecutable.");
+      vscode.window.showErrorMessage("OpenCode: Executable not found.");
       return null;
     }
 
     return vscode.window.withProgress(
       {
         location: vscode.ProgressLocation.Notification,
-        title: "Iniciando servicio OpenCode v2...",
+        title: "Starting OpenCode v2 service...",
         cancellable: false,
       },
       async () => {
         try {
           await execAsync(`"${binInfo.path}" service start`, { timeout: 7000 });
           const url = await this.getServiceUrl();
-          vscode.window.showInformationMessage(`OpenCode Service iniciado correctamente: ${url || "Activo"}`);
+          vscode.window.showInformationMessage(`OpenCode service started successfully: ${url || "Active"}`);
           return url;
         } catch (err: any) {
-          vscode.window.showErrorMessage(`Error al iniciar el servicio: ${err?.message || err}`);
+          vscode.window.showErrorMessage(`Failed to start service: ${err?.message || err}`);
           return null;
         }
       }
@@ -72,11 +72,11 @@ export class OpenCodeServiceManager {
 
     if (!url) {
       const start = await vscode.window.showInformationMessage(
-        "El servicio de OpenCode v2 no parece estar en ejecución. ¿Deseas iniciarlo?",
-        "Iniciar Servicio",
-        "Cancelar"
+        "The OpenCode v2 service does not appear to be running. Would you like to start it?",
+        "Start Service",
+        "Cancel"
       );
-      if (start === "Iniciar Servicio") {
+      if (start === "Start Service") {
         url = await this.startService();
       }
     }

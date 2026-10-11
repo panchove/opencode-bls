@@ -28,7 +28,7 @@ export async function resolveOpenCodeBinary(): Promise<OpenCodeBinaryInfo | null
       return getBinaryDetails(resolvedConfigPath);
     }
     vscode.window.showWarningMessage(
-      `OpenCode: La ruta configurada "${configuredPath}" no existe. Buscando en rutas estándar...`
+      `OpenCode: Configured path "${configuredPath}" does not exist. Searching standard locations...`
     );
   }
 

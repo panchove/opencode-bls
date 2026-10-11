@@ -1,7 +1,7 @@
 {
   "name": "opencode-bls",
   "displayName": "OpenCode BLS",
-  "description": "Extensión optimizada de OpenCode para VS Code con soporte nativo para OpenCode v2.x",
+  "description": "Optimized OpenCode extension for VS Code with native OpenCode v2.x support",
   "version": "1.0.0",
   "publisher": "bls",
   "repository": {
@@ -35,7 +35,7 @@
     "commands": [
       {
         "command": "opencode.openTerminal",
-        "title": "OpenCode: Abrir o enfocar terminal",
+        "title": "OpenCode: Open or Focus Terminal",
         "icon": {
           "light": "images/button-light.svg",
           "dark": "images/button-dark.svg"
@@ -43,7 +43,7 @@
       },
       {
         "command": "opencode.openNewTerminal",
-        "title": "OpenCode: Abrir nueva pestaña en terminal",
+        "title": "OpenCode: Open New Terminal Tab",
         "icon": {
           "light": "images/button-light.svg",
           "dark": "images/button-dark.svg"
@@ -51,19 +51,19 @@
       },
       {
         "command": "opencode.addFilepathToTerminal",
-        "title": "OpenCode: Insertar referencia de archivo/líneas (@archivo#L...)"
+        "title": "OpenCode: Insert File/Line Reference (@file#L...)"
       },
       {
         "command": "opencode.sendSelectionToTerminal",
-        "title": "OpenCode: Enviar selección de código a la terminal"
+        "title": "OpenCode: Send Code Selection to Terminal"
       },
       {
         "command": "opencode.openWebUI",
-        "title": "OpenCode: Abrir interfaz Web (v2 Dashboard)"
+        "title": "OpenCode: Open Web UI (v2 Dashboard)"
       },
       {
         "command": "opencode.startService",
-        "title": "OpenCode: Iniciar servicio en segundo plano (daemon)"
+        "title": "OpenCode: Start Background Daemon Service"
       }
     ],
     "menus": {
@@ -122,7 +122,7 @@
         "opencode.executablePath": {
           "type": "string",
           "default": "",
-          "description": "Ruta personalizada al ejecutable de opencode. Si está vacío, se busca automáticamente en PATH y ~/.opencode/bin/opencode."
+          "description": "Custom path to the opencode executable. If empty, it searches automatically in PATH and ~/.opencode/bin/opencode."
         },
         "opencode.terminalLocation": {
           "type": "string",
@@ -131,7 +131,7 @@
             "panel"
           ],
           "default": "beside",
-          "description": "Ubicación donde se abre la terminal de OpenCode ('beside' para columna lateral, 'panel' para la sección inferior)."
+          "description": "Location where the OpenCode terminal opens ('beside' for split editor, 'panel' for bottom panel)."
         },
         "opencode.extraArgs": {
           "type": "array",
@@ -139,12 +139,12 @@
             "type": "string"
           },
           "default": [],
-          "description": "Argumentos adicionales pasados a la CLI de OpenCode al iniciar la terminal (ej: ['--auto'])."
+          "description": "Additional arguments passed to the OpenCode CLI when launching the terminal (e.g. ['--auto'])."
         },
         "opencode.webUrl": {
           "type": "string",
           "default": "",
-          "description": "URL personalizada para la interfaz web de OpenCode. Si está vacía, se consulta automáticamente mediante 'opencode service status'."
+          "description": "Custom URL for the OpenCode web interface. If empty, it queries automatically using 'opencode service status'."
         }
       }
     }

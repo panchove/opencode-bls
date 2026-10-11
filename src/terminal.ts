@@ -36,14 +36,14 @@ export class TerminalManager {
     const binInfo = await resolveOpenCodeBinary();
     if (!binInfo) {
       const action = await vscode.window.showErrorMessage(
-        "OpenCode: No se encontró el ejecutable 'opencode' en el sistema ni en ~/.opencode/bin/opencode.",
-        "Ver Guía de Instalación",
-        "Configurar Ruta"
+        "OpenCode: 'opencode' executable was not found on your system or ~/.opencode/bin/opencode.",
+        "View Installation Guide",
+        "Configure Path"
       );
 
-      if (action === "Ver Guía de Instalación") {
+      if (action === "View Installation Guide") {
         vscode.env.openExternal(vscode.Uri.parse("https://opencode.ai"));
-      } else if (action === "Configurar Ruta") {
+      } else if (action === "Configure Path") {
         vscode.commands.executeCommand("workbench.action.openSettings", "opencode.executablePath");
       }
       return null;
@@ -126,7 +126,7 @@ export class TerminalManager {
   public async addFilepathToTerminal(): Promise<void> {
     const ref = this.getActiveFileReference();
     if (!ref) {
-      vscode.window.showInformationMessage("OpenCode: No hay un archivo o selección activa para referenciar.");
+      vscode.window.showInformationMessage("OpenCode: No active file or selection to reference.");
       return;
     }
 
@@ -158,7 +158,7 @@ export class TerminalManager {
 
     const selectionText = editor.document.getText(editor.selection);
     if (!selectionText || selectionText.trim() === "") {
-      vscode.window.showInformationMessage("OpenCode: No hay texto seleccionado para enviar.");
+      vscode.window.showInformationMessage("OpenCode: No text selected to send.");
       return;
     }
 

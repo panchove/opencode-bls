@@ -41,7 +41,7 @@ export function activate(context: vscode.ExtensionContext) {
   const statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
   statusBarItem.command = "opencode.openTerminal";
   statusBarItem.text = "$(terminal) OpenCode";
-  statusBarItem.tooltip = "Abrir terminal de OpenCode v2 (Ctrl+Esc / Cmd+Esc)";
+  statusBarItem.tooltip = "Open OpenCode v2 terminal (Ctrl+Esc / Cmd+Esc)";
   statusBarItem.show();
 
   context.subscriptions.push(
@@ -57,7 +57,7 @@ export function activate(context: vscode.ExtensionContext) {
   // Proactive check in background (non-blocking)
   resolveOpenCodeBinary().then((binInfo) => {
     if (binInfo?.version) {
-      statusBarItem.tooltip = `OpenCode ${binInfo.version} listo (${binInfo.path})`;
+      statusBarItem.tooltip = `OpenCode ${binInfo.version} ready (${binInfo.path})`;
     }
   });
 }

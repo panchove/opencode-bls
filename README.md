@@ -1,116 +1,116 @@
 # OpenCode BLS (VS Code Extension)
 
-Extensión para Visual Studio Code optimizada para interactuar con **OpenCode v2.x**, diseñada para reemplazar la extensión original `sst-dev.opencode` (cuyo comando `--port` quedó deprecado e incompatible con la versión 2).
+An optimized Visual Studio Code extension to interact seamlessly with **OpenCode v2.x**, designed to replace the original `sst-dev.opencode` extension (which relied on the `--port` flag that is now deprecated and incompatible with version 2).
 
 ---
 
-## 🚀 ¿Por qué esta extensión?
+## 🚀 Why this extension?
 
-La extensión original de SST (`sst-dev.opencode`) fue desarrollada para OpenCode v1 e intentaba iniciar la CLI ejecutando:
+The original SST extension (`sst-dev.opencode`) was built for OpenCode v1 and launched the CLI with:
 ```bash
-opencode --port <puerto_aleatorio>
+opencode --port <random_port>
 ```
-En **OpenCode v2.x**:
-- El parámetro `--port` en la raíz ya no existe y provoca un fallo de inicio (`unknown flag: --port`).
-- OpenCode v2 utiliza una arquitectura con servicio en segundo plano (`opencode service`) y sesión TUI directa.
-- El ejecutable con frecuencia se instala en `~/.opencode/bin/opencode` y no siempre está en el `$PATH` de las sesiones gráficas del editor.
+In **OpenCode v2.x**:
+- The `--port` flag at the root level no longer exists and causes launch failures (`unknown flag: --port`).
+- OpenCode v2 uses a background service architecture (`opencode service`) alongside direct interactive TUI sessions.
+- The binary is often installed in `~/.opencode/bin/opencode` and is not always included in the GUI editor's `$PATH`.
 
-**OpenCode BLS** resuelve estos problemas:
-1. **Compatible al 100% con OpenCode v2.x**: Lanza la CLI de forma nativa sin flags inválidos.
-2. **Detección inteligente del binario**: Busca automáticamente en tu `$PATH`, en `~/.opencode/bin/opencode`, `~/.local/bin/opencode` o mediante configuración personalizada.
-3. **Mantiene los atajos y flujos de trabajo habituales** (`Ctrl+Esc`, inserción de `@archivo#L...`, etc.).
-4. **Integración con la Web UI v2**: Permite abrir la consola web de OpenCode v2 directamente desde VS Code.
-5. **Ubicación configurable de la terminal**: Permite abrirla al lado del editor (`beside`) o en el panel inferior (`panel`).
-
----
-
-## ⌨️ Atajos de Teclado y Comandos
-
-| Comando                                | Windows / Linux        | macOS                  | Descripción                                                                                        |
-|:---------------------------------------|:-----------------------|:-----------------------|:---------------------------------------------------------------------------------------------------|
-| **`opencode.openTerminal`**            | `Ctrl + Esc`           | `Cmd + Esc`            | Abre o enfoca la terminal activa de OpenCode                                                       |
-| **`opencode.openNewTerminal`**         | `Ctrl + Shift + Esc`   | `Cmd + Shift + Esc`    | Abre una nueva pestaña de terminal de OpenCode                                                     |
-| **`opencode.addFilepathToTerminal`**   | `Ctrl + Alt + K`       | `Cmd + Alt + K`        | Inserta la referencia del archivo actual y líneas seleccionadas (`@archivo#L10-20`) en la terminal |
-| **`opencode.sendSelectionToTerminal`** | `Ctrl + Alt + L`       | `Cmd + Alt + L`        | Envía el texto seleccionado directamente a la terminal de OpenCode                                 |
-| **`opencode.openWebUI`**               | *(Paleta de comandos)* | *(Paleta de comandos)* | Abre la interfaz web (Dashboard) de OpenCode v2                                                    |
-| **`opencode.startService`**            | *(Paleta de comandos)* | *(Paleta de comandos)* | Inicia el servicio en segundo plano de OpenCode v2                                                 |
-
-Además:
-- **Botón en la barra de título del editor**: Icono directo para abrir OpenCode al lado de tu código.
-- **Barra de estado (Status Bar)**: Muestra el estado y versión detectada de OpenCode en la barra inferior.
+**OpenCode BLS** solves these issues:
+1. **100% Compatible with OpenCode v2.x**: Launches the CLI natively without invalid flags.
+2. **Smart Binary Resolution**: Automatically detects the executable in your `$PATH`, `~/.opencode/bin/opencode`, `~/.local/bin/opencode`, or via a custom configured path.
+3. **Preserves familiar shortcuts and workflows** (`Ctrl+Esc`, `@file#L...` line reference insertion, selection sending, etc.).
+4. **OpenCode v2 Web UI Integration**: Directly open the OpenCode v2 Web Dashboard from VS Code.
+5. **Configurable Terminal Location**: Choose between opening side-by-side (`beside`) or in the bottom panel (`panel`).
 
 ---
 
-## ⚙️ Configuración (`settings.json`)
+## ⌨️ Keybindings and Commands
 
-Puedes personalizar la extensión desde los ajustes de VS Code:
+| Command                                | Windows / Linux      | macOS               | Description                                                                        |
+|:---------------------------------------|:---------------------|:--------------------|:-----------------------------------------------------------------------------------|
+| **`opencode.openTerminal`**            | `Ctrl + Esc`         | `Cmd + Esc`         | Open or focus the active OpenCode terminal                                         |
+| **`opencode.openNewTerminal`**         | `Ctrl + Shift + Esc` | `Cmd + Shift + Esc` | Open a new OpenCode terminal tab                                                   |
+| **`opencode.addFilepathToTerminal`**   | `Ctrl + Alt + K`     | `Cmd + Alt + K`     | Insert active file and line selection reference (`@file#L10-20`) into the terminal |
+| **`opencode.sendSelectionToTerminal`** | `Ctrl + Alt + L`     | `Cmd + Alt + L`     | Send selected code directly to the OpenCode terminal                               |
+| **`opencode.openWebUI`**               | *(Command Palette)*  | *(Command Palette)* | Open the OpenCode v2 Web UI Dashboard                                              |
+| **`opencode.startService`**            | *(Command Palette)*  | *(Command Palette)* | Start the OpenCode v2 background daemon service                                    |
+
+Additionally:
+- **Editor Title Bar Button**: Quick action button to launch OpenCode right next to your editor.
+- **Status Bar Item**: Displays OpenCode status and detected version in the bottom status bar.
+
+---
+
+## ⚙️ Configuration (`settings.json`)
+
+Customize the extension behavior in your VS Code settings:
 
 ```json
 {
-  // Ruta personalizada al binario de opencode (opcional, si no está en PATH ni en ~/.opencode/bin)
+  // Custom path to the opencode binary (optional, if not in PATH or ~/.opencode/bin)
   "opencode.executablePath": "",
 
-  // Dónde se abre la terminal: "beside" (panel lateral dividido) o "panel" (abajo)
+  // Terminal location: "beside" (side-by-side split editor) or "panel" (bottom panel)
   "opencode.terminalLocation": "beside",
 
-  // Argumentos adicionales que quieras pasar a la CLI (ejemplo: ["--auto"])
+  // Extra CLI arguments to pass when starting the terminal (e.g. ["--auto"])
   "opencode.extraArgs": [],
 
-  // URL del servicio web si utilizas un servidor remoto o puerto fijo
+  // Web service URL if using a remote server or custom fixed port
   "opencode.webUrl": ""
 }
 ```
 
 ---
 
-## 🛠️ Desarrollo y Pruebas
+## 🛠️ Development & Testing
 
-### 1. Probar en desarrollo (F5)
-1. Abre este repositorio en VS Code.
-2. Presiona **`F5`** (o ejecuta la tarea `Ejecutar Extensión (F5)`).
-3. Se abrirá una nueva ventana del editor ("Extension Development Host") con la extensión cargada y funcionando.
+### 1. Run in development (F5)
+1. Open this repository in VS Code / Antigravity IDE.
+2. Press **`F5`** (or run the `Launch Extension (F5)` task).
+3. A new Extension Development Host window will launch with the extension running.
 
-### 2. Compilar el paquete `.vsix`
-Para generar el archivo instalable:
+### 2. Build the `.vsix` package
+To build an installable package:
 ```bash
 npm run build:vsix
 ```
-Esto creará el archivo `opencode-bls-1.0.0.vsix` en la raíz del proyecto.
+This will generate `opencode-bls-1.0.0.vsix` in the project root.
 
-### 3. Instalar la extensión en tu entorno (Antigravity IDE / VS Code)
+### 3. Install the extension in your environment (Antigravity IDE / VS Code)
 
-**Si usas Antigravity IDE:**
+**If using Antigravity IDE:**
 ```bash
 antigravity-ide --install-extension opencode-bls-1.0.0.vsix
 ```
 
-**Si usas VS Code estándar:**
+**If using standard VS Code:**
 ```bash
 code --install-extension opencode-bls-1.0.0.vsix
 ```
 
-O desde la interfaz gráfica:
-- Ve a la pestaña **Extensiones** (`Ctrl+Shift+X`).
-- Haz clic en el menú de tres puntos `...` arriba a la derecha.
-- Selecciona **"Install from VSIX..."** y elige el archivo `opencode-bls-1.0.0.vsix`.
-- Recarga la ventana con `Ctrl+Shift+P` -> `Developer: Reload Window`.
+Or via GUI:
+- Open the **Extensions** view (`Ctrl+Shift+X`).
+- Click the `...` menu in the top-right corner.
+- Select **"Install from VSIX..."** and choose `opencode-bls-1.0.0.vsix`.
+- Reload window (`Ctrl+Shift+P` -> `Developer: Reload Window`).
 
 ---
 
-## 📁 Estructura del Proyecto
+## 📁 Project Structure
 
 ```
 opencode-bls/
 ├── src/
-│   ├── extension.ts     # Punto de entrada, registro de comandos y barra de estado
-│   ├── terminal.ts      # Gestión de terminales, paso de referencias @archivo#L...
-│   ├── binary.ts        # Detección y validación del ejecutable opencode v2
-│   └── service.ts       # Comunicación con el daemon y Dashboard Web de OpenCode v2
-├── images/              # Iconos para temas claros/oscuros y botón de navegación
+│   ├── extension.ts     # Extension entry point, command registration & status bar
+│   ├── terminal.ts      # Terminal management & @file#L... reference passing
+│   ├── binary.ts        # Detection and validation of the opencode v2 executable
+│   └── service.ts       # OpenCode v2 daemon service & Web UI integration
+├── images/              # Icons for light/dark themes and navigation button
 ├── .vscode/
-│   ├── launch.json      # Configuración de depuración con F5
-│   └── tasks.json       # Tarea de compilación en segundo plano (esbuild)
-├── esbuild.js           # Script de empaquetado ultrarrápido
-├── package.json         # Manifiesto de la extensión VS Code
-└── tsconfig.json        # Configuración de TypeScript
+│   ├── launch.json      # F5 debugging configuration
+│   └── tasks.json       # Background build task (esbuild)
+├── esbuild.js           # Fast bundling configuration
+├── package.json         # Extension manifest
+└── tsconfig.json        # TypeScript configuration
 ```
