@@ -22,6 +22,8 @@ In **OpenCode v2.x**:
 4. **OpenCode v2 Web UI Integration**: Directly open the OpenCode v2 Web Dashboard from VS Code.
 5. **Configurable Terminal Location**: Choose between opening side-by-side (`beside`) or in the bottom panel (`panel`).
 
+> For full technical details and debugging, see the [Troubleshooting & Migration Guide](TROUBLESHOOTING.md).
+
 ---
 
 ## ⌨️ Keybindings and Commands
