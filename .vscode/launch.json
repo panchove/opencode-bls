@@ -1,0 +1,18 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Ejecutar Extensión (F5)",
+      "type": "extensionDevelopmentHost",
+      "request": "launch",
+      "runtimeExecutable": "/home/panchove/Escritorio/Antigravity IDE/antigravity-ide",
+      "args": [
+        "--extensionDevelopmentPath=${workspaceFolder}"
+      ],
+      "outFiles": [
+        "${workspaceFolder}/dist/**/*.js"
+      ],
+      "preLaunchTask": "npm: watch"
+    }
+  ]
+}

@@ -1,0 +1,168 @@
+{
+  "name": "opencode-bls",
+  "displayName": "OpenCode BLS",
+  "description": "Extensión optimizada de OpenCode para VS Code con soporte nativo para OpenCode v2.x",
+  "version": "1.0.0",
+  "publisher": "bls",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bls/opencode-bls"
+  },
+  "license": "MIT",
+  "icon": "images/icon.png",
+  "galleryBanner": {
+    "color": "#131010",
+    "theme": "dark"
+  },
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "categories": [
+    "AI",
+    "Programming Languages",
+    "Other"
+  ],
+  "keywords": [
+    "opencode",
+    "ai",
+    "assistant",
+    "copilot",
+    "agent"
+  ],
+  "activationEvents": [],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "opencode.openTerminal",
+        "title": "OpenCode: Abrir o enfocar terminal",
+        "icon": {
+          "light": "images/button-light.svg",
+          "dark": "images/button-dark.svg"
+        }
+      },
+      {
+        "command": "opencode.openNewTerminal",
+        "title": "OpenCode: Abrir nueva pestaña en terminal",
+        "icon": {
+          "light": "images/button-light.svg",
+          "dark": "images/button-dark.svg"
+        }
+      },
+      {
+        "command": "opencode.addFilepathToTerminal",
+        "title": "OpenCode: Insertar referencia de archivo/líneas (@archivo#L...)"
+      },
+      {
+        "command": "opencode.sendSelectionToTerminal",
+        "title": "OpenCode: Enviar selección de código a la terminal"
+      },
+      {
+        "command": "opencode.openWebUI",
+        "title": "OpenCode: Abrir interfaz Web (v2 Dashboard)"
+      },
+      {
+        "command": "opencode.startService",
+        "title": "OpenCode: Iniciar servicio en segundo plano (daemon)"
+      }
+    ],
+    "menus": {
+      "editor/title": [
+        {
+          "command": "opencode.openTerminal",
+          "group": "navigation@10"
+        }
+      ],
+      "editor/context": [
+        {
+          "command": "opencode.addFilepathToTerminal",
+          "group": "opencode@1"
+        },
+        {
+          "command": "opencode.sendSelectionToTerminal",
+          "group": "opencode@2",
+          "when": "editorHasSelection"
+        }
+      ]
+    },
+    "keybindings": [
+      {
+        "command": "opencode.openTerminal",
+        "key": "cmd+escape",
+        "mac": "cmd+escape",
+        "win": "ctrl+escape",
+        "linux": "ctrl+escape"
+      },
+      {
+        "command": "opencode.openNewTerminal",
+        "key": "cmd+shift+escape",
+        "mac": "cmd+shift+escape",
+        "win": "ctrl+shift+escape",
+        "linux": "ctrl+shift+escape"
+      },
+      {
+        "command": "opencode.addFilepathToTerminal",
+        "key": "cmd+alt+k",
+        "mac": "cmd+alt+k",
+        "win": "ctrl+alt+k",
+        "linux": "ctrl+alt+k"
+      },
+      {
+        "command": "opencode.sendSelectionToTerminal",
+        "key": "cmd+alt+l",
+        "mac": "cmd+alt+l",
+        "win": "ctrl+alt+l",
+        "linux": "ctrl+alt+l",
+        "when": "editorHasSelection"
+      }
+    ],
+    "configuration": {
+      "title": "OpenCode BLS",
+      "properties": {
+        "opencode.executablePath": {
+          "type": "string",
+          "default": "",
+          "description": "Ruta personalizada al ejecutable de opencode. Si está vacío, se busca automáticamente en PATH y ~/.opencode/bin/opencode."
+        },
+        "opencode.terminalLocation": {
+          "type": "string",
+          "enum": [
+            "beside",
+            "panel"
+          ],
+          "default": "beside",
+          "description": "Ubicación donde se abre la terminal de OpenCode ('beside' para columna lateral, 'panel' para la sección inferior)."
+        },
+        "opencode.extraArgs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "description": "Argumentos adicionales pasados a la CLI de OpenCode al iniciar la terminal (ej: ['--auto'])."
+        },
+        "opencode.webUrl": {
+          "type": "string",
+          "default": "",
+          "description": "URL personalizada para la interfaz web de OpenCode. Si está vacía, se consulta automáticamente mediante 'opencode service status'."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run package",
+    "compile": "tsc --noEmit && node esbuild.js",
+    "watch": "node esbuild.js --watch",
+    "watch:tsc": "tsc --noEmit --watch",
+    "package": "tsc --noEmit && node esbuild.js --production",
+    "check-types": "tsc --noEmit",
+    "build:vsix": "npm run package && npx @vscode/vsce package"
+  },
+  "devDependencies": {
+    "@types/node": "^20.17.0",
+    "@types/vscode": "^1.90.0",
+    "@vscode/vsce": "^3.2.1",
+    "esbuild": "^0.25.0",
+    "typescript": "^5.8.0"
+  }
+}
