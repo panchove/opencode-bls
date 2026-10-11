@@ -21,6 +21,7 @@ In **OpenCode v2.x**:
 3. **Preserves familiar shortcuts and workflows** (`Ctrl+Esc`, `@file#L...` line reference insertion, selection sending, etc.).
 4. **OpenCode v2 Web UI Integration**: Directly open the OpenCode v2 Web Dashboard from VS Code.
 5. **Configurable Terminal Location**: Choose between opening side-by-side (`beside`) or in the bottom panel (`panel`).
+6. **Backward Compatible with OpenCode v1.x**: Core terminal workflow and context piping work seamlessly across both v1 and v2, with graceful upgrade guidance for v2-exclusive features.
 
 > For full technical details and debugging, see the [Troubleshooting & Migration Guide](TROUBLESHOOTING.md).
 

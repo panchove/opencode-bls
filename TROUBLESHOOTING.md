@@ -80,3 +80,24 @@ Developers frequently need to reference specific code lines or send selected sni
   - Automatically targets the active OpenCode terminal session.
 - **`opencode.sendSelectionToTerminal` (`Ctrl+Alt+L` / `Cmd+Alt+L`)**:
   - Directly pipes the selected text into the terminal buffer.
+
+---
+
+## 5. Backward Compatibility with OpenCode v1.x
+
+### Compatibility Matrix
+
+| Feature | OpenCode v1.x | OpenCode v2.x | Behavior in OpenCode BLS |
+|:---|:---:|:---:|:---|
+| **Interactive Terminal (`Ctrl+Esc`)** | ✅ Supported | ✅ Supported | Runs `opencode` cleanly in the integrated terminal without deprecated flags |
+| **Insert Reference (`@file#L...`)** | ✅ Supported | ✅ Supported | Fully compatible with prompt reference syntax |
+| **Send Code Selection** | ✅ Supported | ✅ Supported | Directly pipes selected editor text to terminal |
+| **Binary Auto-detection** | ✅ Supported | ✅ Supported | Scans `$PATH`, standard paths, and custom config |
+| **Daemon Service (`opencode.startService`)** | ⚠️ v2-only | ✅ Supported | Graceful warning with one-click **"Upgrade Guide"** action |
+| **Web Dashboard (`opencode.openWebUI`)** | ⚠️ v2-only | ✅ Supported | Graceful warning with one-click **"Upgrade Guide"** action |
+
+### Graceful Fallback Strategy
+Instead of failing with an OS or CLI command error when running on an OpenCode v1 installation, OpenCode BLS detects the major version via semver regex parsing (`v?(\d+)\.`). If a v1 binary is detected and the user triggers a v2-only service command, an informative dialog is presented:
+> *"OpenCode Web UI requires OpenCode v2.x (detected v1.x). Please upgrade to use this feature."*
+Along with a direct button to the official upgrade guide (`https://opencode.ai`).
+
