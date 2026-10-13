@@ -77,20 +77,37 @@ export class TerminalManager {
     terminal.show();
 
     // In OpenCode v2, we invoke the executable directly without the deprecated --port flag.
-    const argsString = extraArgs.length > 0 ? " " + extraArgs.join(" ") : "";
-    const launchCommand = `"${binInfo.path}"${argsString}`;
+    const launchCommand = this.buildLaunchCommand(binInfo, extraArgs);
     terminal.sendText(launchCommand);
 
-    // If an editor has an active file or selection, optionally provide quick context
-    const ref = this.getActiveFileReference();
-    if (ref) {
-      // Small pause to allow TUI prompt to initialize before sending file reference
-      setTimeout(() => {
-        terminal.sendText(`In ${ref}`, false);
-      }, 1200);
+    return terminal;
+  }
+
+  /**
+   * Formats the CLI invocation command appropriately for the active shell (PowerShell, cmd, bash).
+   */
+  private buildLaunchCommand(binInfo: import("./binary").OpenCodeBinaryInfo, extraArgs: string[]): string {
+    const argsString = extraArgs.length > 0 ? " " + extraArgs.join(" ") : "";
+    const isWindows = process.platform === "win32";
+
+    // If available directly in PATH, typing "opencode" is standard and works uniformly across all shells
+    if (binInfo.fromPath) {
+      return `opencode${argsString}`;
     }
 
-    return terminal;
+    // When launching via full path, format appropriately for the shell
+    const shell = (vscode.env.shell || "").toLowerCase();
+    const isPowerShell =
+      shell.includes("powershell") ||
+      shell.includes("pwsh") ||
+      (isWindows && !shell.includes("cmd") && !shell.includes("bash") && !shell.includes("sh") && !shell.includes("zsh"));
+
+    if (isPowerShell) {
+      // In PowerShell, quoted executable paths require the call operator (&)
+      return `& "${binInfo.path}"${argsString}`;
+    }
+
+    return `"${binInfo.path}"${argsString}`;
   }
 
   /**
@@ -108,7 +125,8 @@ export class TerminalManager {
       return null;
     }
 
-    let ref = `@${vscode.workspace.asRelativePath(docUri, false)}`;
+    const relativePath = vscode.workspace.asRelativePath(docUri, false).replace(/\\/g, "/");
+    let ref = `@${relativePath}`;
     const selection = editor.selection;
 
     if (!selection.isEmpty) {
@@ -138,6 +156,12 @@ export class TerminalManager {
         terminal = found;
       } else {
         terminal = await this.createOpenCodeTerminal();
+        if (terminal) {
+          setTimeout(() => {
+            terminal?.sendText(ref, false);
+          }, 1500);
+          return;
+        }
       }
     }
 
@@ -164,7 +188,18 @@ export class TerminalManager {
 
     let terminal: vscode.Terminal | null | undefined = vscode.window.activeTerminal;
     if (!terminal || terminal.name !== TERMINAL_NAME) {
-      terminal = await this.openTerminal();
+      const found = vscode.window.terminals.find((t) => t.name === TERMINAL_NAME);
+      if (found) {
+        terminal = found;
+      } else {
+        terminal = await this.createOpenCodeTerminal();
+        if (terminal) {
+          setTimeout(() => {
+            terminal?.sendText(selectionText, false);
+          }, 1500);
+          return;
+        }
+      }
     }
 
     if (terminal) {

@@ -11,6 +11,7 @@ export interface OpenCodeBinaryInfo {
   path: string;
   version?: string;
   isV2: boolean;
+  fromPath: boolean;
 }
 
 /**
@@ -20,12 +21,20 @@ export interface OpenCodeBinaryInfo {
 export async function resolveOpenCodeBinary(): Promise<OpenCodeBinaryInfo | null> {
   const config = vscode.workspace.getConfiguration("opencode");
   const configuredPath = config.get<string>("executablePath", "").trim();
+  const isWindows = process.platform === "win32";
 
   // 1. Configured path
   if (configuredPath) {
-    const resolvedConfigPath = expandHome(configuredPath);
+    let resolvedConfigPath = expandHome(configuredPath);
+    if (!fs.existsSync(resolvedConfigPath) && isWindows) {
+      if (fs.existsSync(resolvedConfigPath + ".cmd")) {
+        resolvedConfigPath += ".cmd";
+      } else if (fs.existsSync(resolvedConfigPath + ".exe")) {
+        resolvedConfigPath += ".exe";
+      }
+    }
     if (fs.existsSync(resolvedConfigPath)) {
-      return getBinaryDetails(resolvedConfigPath);
+      return getBinaryDetails(resolvedConfigPath, false);
     }
     vscode.window.showWarningMessage(
       `OpenCode: Configured path "${configuredPath}" does not exist. Searching standard locations...`
@@ -34,27 +43,63 @@ export async function resolveOpenCodeBinary(): Promise<OpenCodeBinaryInfo | null
 
   // 2. Standard ~/.opencode/bin/opencode location (primary location for OpenCode v2 installer)
   const home = os.homedir();
-  const candidatePaths = [
-    path.join(home, ".opencode", "bin", "opencode"),
-    path.join(home, ".local", "bin", "opencode"),
-    "/usr/local/bin/opencode",
-    "/usr/bin/opencode",
-  ];
+  const candidatePaths = isWindows
+    ? [
+        path.join(home, ".opencode", "bin", "opencode.exe"),
+        path.join(home, ".opencode", "bin", "opencode.cmd"),
+        path.join(home, ".opencode", "bin", "opencode"),
+        path.join(home, "AppData", "Roaming", "npm", "opencode.cmd"),
+        path.join(home, ".local", "bin", "opencode.exe"),
+        path.join(home, ".local", "bin", "opencode.cmd"),
+        path.join(home, ".local", "bin", "opencode"),
+      ]
+    : [
+        path.join(home, ".opencode", "bin", "opencode"),
+        path.join(home, ".local", "bin", "opencode"),
+        "/opt/homebrew/bin/opencode",
+        "/usr/local/bin/opencode",
+        "/usr/bin/opencode",
+        path.join(home, ".bun", "bin", "opencode"),
+      ];
 
   for (const candidate of candidatePaths) {
     if (fs.existsSync(candidate)) {
-      return getBinaryDetails(candidate);
+      return getBinaryDetails(candidate, false);
     }
   }
 
   // 3. System PATH check
   try {
-    const isWindows = process.platform === "win32";
     const whichCmd = isWindows ? "where opencode" : "which opencode";
     const { stdout } = await execAsync(whichCmd);
-    const firstLine = stdout.trim().split(/\r?\n/)[0];
-    if (firstLine && fs.existsSync(firstLine)) {
-      return getBinaryDetails(firstLine);
+    const lines = stdout
+      .trim()
+      .split(/\r?\n/)
+      .map((l) => l.trim())
+      .filter(Boolean);
+
+    let chosenPath: string | undefined;
+
+    if (isWindows) {
+      // In Windows, npm generates both an extensionless bash script and .cmd / .exe files in PATH.
+      // We must prefer .cmd, .exe, or .bat over the extensionless bash script.
+      chosenPath = lines.find((l) => /\.(exe|cmd|bat)$/i.test(l));
+      if (!chosenPath && lines.length > 0) {
+        const first = lines[0];
+        if (fs.existsSync(`${first}.cmd`)) {
+          chosenPath = `${first}.cmd`;
+        } else if (fs.existsSync(`${first}.exe`)) {
+          chosenPath = `${first}.exe`;
+        } else {
+          chosenPath = first;
+        }
+      }
+    } else {
+      chosenPath = lines[0];
+    }
+
+    if (chosenPath && fs.existsSync(chosenPath)) {
+      return getBinaryDetails(chosenPath, true);
     }
   } catch {
     // Not found in PATH
@@ -70,7 +115,7 @@ function expandHome(filepath: string): string {
   return filepath;
 }
 
-async function getBinaryDetails(binPath: string): Promise<OpenCodeBinaryInfo> {
+async function getBinaryDetails(binPath: string, fromPath = false): Promise<OpenCodeBinaryInfo> {
   let versionStr: string | undefined;
   let isV2 = true;
 
@@ -93,5 +138,6 @@ async function getBinaryDetails(binPath: string): Promise<OpenCodeBinaryInfo> {
     path: binPath,
     version: versionStr,
     isV2,
+    fromPath,
   };
 }

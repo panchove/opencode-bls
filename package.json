@@ -2,8 +2,8 @@
   "name": "opencode-bls",
   "displayName": "OpenCode BLS",
   "description": "Optimized OpenCode extension for VS Code with native OpenCode v2.x support",
-  "version": "1.0.0",
-  "publisher": "bls",
+  "version": "1.0.1",
+  "publisher": "bls-ve",
   "repository": {
     "type": "git",
     "url": "https://github.com/panchove/opencode-bls"

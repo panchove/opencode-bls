@@ -5,6 +5,14 @@ All notable changes to the **OpenCode BLS** extension will be documented in this
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.1] - 2026-10-13
+
+### Fixed
+- **Windows Terminal CLI Execution**: Fixed an issue in PowerShell where quoted binary paths were evaluated as string literals rather than executed with the call operator (`&`). When `opencode` is available in `PATH`, it is now invoked directly across all shells.
+- **Windows Binary Resolution**: Prioritized Windows executable extensions (`.cmd`, `.exe`, `.bat`) over extensionless POSIX shell wrapper scripts in `%APPDATA%\npm`.
+- **Unsolicited Terminal Input**: Removed unsolicited automatic `In @...` context injection on terminal launch that polluted the command prompt.
+- **Path Separators**: Normalized relative file paths with forward slashes (`/`) for cross-platform OpenCode `@file` reference syntax.
+
 ## [1.0.0] - 2026-10-11
 
 ### Added

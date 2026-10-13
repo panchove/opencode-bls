@@ -22,6 +22,7 @@ In **OpenCode v2.x**:
 4. **OpenCode v2 Web UI Integration**: Directly open the OpenCode v2 Web Dashboard from VS Code.
 5. **Configurable Terminal Location**: Choose between opening side-by-side (`beside`) or in the bottom panel (`panel`).
 6. **Backward Compatible with OpenCode v1.x**: Core terminal workflow and context piping work seamlessly across both v1 and v2, with graceful upgrade guidance for v2-exclusive features.
+7. **Robust Windows & PowerShell Support**: Native handling for PowerShell call operator (`&`), npm Windows wrappers (`.cmd`/`.exe` priority), and clean prompt startup without text pollution.
 
 > For full technical details and debugging, see the [Troubleshooting & Migration Guide](TROUBLESHOOTING.md).
 
@@ -78,25 +79,59 @@ To build an installable package:
 ```bash
 npm run build:vsix
 ```
-This will generate `opencode-bls-1.0.0.vsix` in the project root.
+This will generate `opencode-bls-1.0.1.vsix` in the project root.
 
 ### 3. Install the extension in your environment (Antigravity IDE / VS Code)
 
 **If using Antigravity IDE:**
 ```bash
-antigravity-ide --install-extension opencode-bls-1.0.0.vsix
+antigravity-ide --install-extension opencode-bls-1.0.1.vsix
 ```
 
 **If using standard VS Code:**
 ```bash
-code --install-extension opencode-bls-1.0.0.vsix
+code --install-extension opencode-bls-1.0.1.vsix
 ```
 
 Or via GUI:
 - Open the **Extensions** view (`Ctrl+Shift+X`).
 - Click the `...` menu in the top-right corner.
-- Select **"Install from VSIX..."** and choose `opencode-bls-1.0.0.vsix`.
+- Select **"Install from VSIX..."** and choose `opencode-bls-1.0.1.vsix`.
 - Reload window (`Ctrl+Shift+P` -> `Developer: Reload Window`).
+
+---
+
+## 💻 Windows & PowerShell Considerations (For Developers)
+
+When developing extensions or tools that interface with VS Code's integrated terminal on Windows, several critical shell-specific differences must be addressed:
+
+### 1. PowerShell Quoted Path Evaluation (`&` Call Operator)
+In standard Unix shells (`bash`, `zsh`) and Command Prompt (`cmd.exe`), invoking a quoted executable runs the program:
+```bash
+"C:\Program Files\OpenCode\opencode.exe"
+```
+In **PowerShell** (both Windows PowerShell 5.1 and PowerShell Core 7+ / `pwsh`), typing a quoted string evaluates it as a string literal and simply echoes the path back to the console:
+```powershell
+PS> "C:\Program Files\OpenCode\opencode.exe"
+C:\Program Files\OpenCode\opencode.exe   # ❌ Output string, did not execute!
+```
+To execute quoted commands or variables in PowerShell, the call operator `&` is required:
+```powershell
+PS> & "C:\Program Files\OpenCode\opencode.exe"  # ✅ Executes properly
+```
+*Solution*: **OpenCode BLS** invokes `opencode` directly when present in `$PATH` (cross-platform compatible across all shells), and dynamically detects PowerShell (`vscode.env.shell`) to prepend `&` when full quoted paths are used.
+
+### 2. Windows Executable Resolution with npm (`.cmd` / `.exe` vs Extensionless Scripts)
+When packages are installed globally via `npm install -g <pkg>`, npm generates three wrapper files in `%APPDATA%\npm`:
+* `pkg` — POSIX shell script without an extension (for Git Bash / Cygwin / MSYS2)
+* `pkg.cmd` — Windows Command Script (for `cmd.exe` and native Windows execution)
+* `pkg.ps1` — PowerShell Script
+
+Standard CLI searches on Windows like `where opencode` list the extensionless POSIX script first. Extensionless files cannot be launched natively by Windows shells without a bash interpreter.
+*Solution*: **OpenCode BLS** checks candidates and filters `where` results to prioritize `.cmd`, `.exe`, and `.bat` files on Windows.
+
+### 3. Clean Prompt Initialization
+Instead of blindly injecting context text into the terminal via `setTimeout`, the extension keeps the terminal launch prompt clean. Context references are only sent when explicitly triggered by the user via dedicated commands (`Ctrl+Alt+K` for `@file#L...` references).
 
 ---
 

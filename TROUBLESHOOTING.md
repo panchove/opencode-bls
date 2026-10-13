@@ -101,3 +101,27 @@ Instead of failing with an OS or CLI command error when running on an OpenCode v
 > *"OpenCode Web UI requires OpenCode v2.x (detected v1.x). Please upgrade to use this feature."*
 Along with a direct button to the official upgrade guide (`https://opencode.ai`).
 
+---
+
+## 6. Windows & PowerShell Execution: Quoted String Evaluation and npm Scripts
+
+### Symptoms
+When launching OpenCode on Windows (where VS Code defaults to PowerShell), the terminal outputs the binary path as text and does not start the CLI:
+```powershell
+PS C:\desarrollos\opencode-bls> "C:\Users\username\AppData\Roaming\npm\opencode"
+C:\Users\username\AppData\Roaming\npm\opencode
+PS C:\desarrollos\opencode-bls> In @[CHANGELOG.md]
+```
+
+### Root Cause
+1. **PowerShell Quoted String Evaluation**: Unlike `cmd.exe` or Unix shells, PowerShell treats `"path\to\binary"` at the command prompt as a string literal and prints it to the console rather than executing it. Executing a quoted binary requires the call operator (`& "path\to\binary"`).
+2. **npm Windows Wrapper Scripts**: On Windows, global npm packages place an extensionless POSIX shell script (`opencode`) alongside Windows batch (`opencode.cmd`) and PowerShell (`opencode.ps1`) scripts in `%APPDATA%\npm`. System `where opencode` calls return the extensionless POSIX script first, which cannot be natively executed by Windows shells.
+3. **Unsolicited Terminal Input**: A delayed `sendText("In " + ref)` call timed out after the command failed, writing context reference text directly into the PowerShell prompt.
+
+### How OpenCode BLS Resolved It
+- **Native Invocation via `$PATH`**: If `opencode` is detected in system `$PATH`, OpenCode BLS sends `opencode` directly without quotes or full paths, running natively across PowerShell, CMD, Git Bash, and Unix shells.
+- **Dynamic Call Operator (`&`) for Custom Paths**: If a full custom path is needed and PowerShell is the active shell (`vscode.env.shell`), the command is formatted with the call operator: `& "${binInfo.path}"`.
+- **Executable Extension Prioritization**: Windows binary detection filters candidate lines to prioritize `.cmd`, `.exe`, and `.bat` files over extensionless shell scripts.
+- **Clean Prompt Launch**: Removed unsolicited automatic text injection on startup, keeping the terminal prompt clean and leaving file references to the dedicated `opencode.addFilepathToTerminal` command (`Ctrl+Alt+K`).
+
+
