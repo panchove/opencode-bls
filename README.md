@@ -1,163 +1,211 @@
-# OpenCode BLS (VS Code Extension)
+# OpenCode BLS — User Documentation & Technical Specification
 
-An optimized Visual Studio Code extension to interact seamlessly with **OpenCode v2.x**, designed to replace the original `sst-dev.opencode` extension (which relied on the `--port` flag that is now deprecated and incompatible with version 2).
+> **Document Identifier:** `DOC-BLS-README-001`  
+> **Applicable Standard:** ISO/IEC/IEEE 26514:2018 (*Systems and software engineering — Requirements for designers and developers of user documentation*)  
+> **Software Target:** OpenCode BLS Extension for Visual Studio Code & Antigravity IDE  
+> **Extension Identifier:** `bls-ve.opencode-bls`  
+> **Version:** `1.0.1` | **Release Date:** `2026-10-13` (ISO 8601)  
+> **Status:** Approved / Production  
 
 ---
 
-## 🚀 Why this extension?
+## 1. Scope & Purpose
 
-The original SST extension (`sst-dev.opencode`) was built for OpenCode v1 and launched the CLI with:
-```bash
-opencode --port <random_port>
+This document provides user, operational, and reference documentation for **OpenCode BLS** (`bls-ve.opencode-bls`), an optimized Visual Studio Code extension engineered to seamlessly interface with the **OpenCode v2.x** and **OpenCode v1.x** AI agent CLI runtimes. 
+
+This extension supersedes the legacy `sst-dev.opencode` client by eliminating obsolete command-line parameters (`--port`), adding multi-platform binary resolution, integrating OpenCode v2 background daemon services, and ensuring zero-friction cross-platform shell compatibility.
+
+---
+
+## 2. Target Audience & System Requirements
+
+### 2.1 Target Audience
+In accordance with ISO/IEC/IEEE 26514 Clause 7.3, this document is structured for:
+* **Software Developers & AI Practitioners**: Integrating OpenCode directly into their daily coding workflow.
+* **Extension Maintainers & Contributors**: Modifying, testing, or building the extension from source.
+* **DevOps & System Administrators**: Deploying `.vsix` packages across team workstations.
+
+### 2.2 System Prerequisites
+* **Editor Platform**: Visual Studio Code `^1.90.0` or Antigravity IDE.
+* **Runtime**: Node.js `^20.17.0` (for building/packaging).
+* **OpenCode CLI**: OpenCode v2.x (recommended) or v1.x installed via official installer, Homebrew, or npm.
+* **Supported Operating Systems**:
+  * **Microsoft Windows**: Windows 10 / 11 (x64, ARM64) — PowerShell 5.1/7+, CMD, Git Bash.
+  * **Apple macOS**: macOS 12+ (Apple Silicon M-series & Intel) — Zsh, Bash, Fish.
+  * **Linux**: Ubuntu/Debian, Fedora, Arch, and compatible POSIX distributions — Bash, Zsh, Fish.
+
+---
+
+## 3. Normative & Informative References
+
+This specification references the following international standards:
+
+| Standard / Reference          | Title / Description                                                                                | Applicability                                              |
+|:------------------------------|:---------------------------------------------------------------------------------------------------|:-----------------------------------------------------------|
+| **ISO/IEC/IEEE 26514:2018**   | Systems and software engineering — Requirements for designers and developers of user documentation | Documentation structure, clarity, and fault recovery       |
+| **ISO 8601**                  | Date and time representation (`YYYY-MM-DD`)                                                        | Release dates, logs, and changelog records                 |
+| **ISO/IEC 25010:2011**        | Systems and software quality requirements and evaluation (SQuaRE) — Quality models                 | Usability, reliability, and portability evaluation         |
+| **SemVer 2.0.0**              | Semantic Versioning Specification                                                                  | Software release, dependency, and compatibility management |
+| **VS Code API Specification** | Visual Studio Code Extensibility Platform API (`@types/vscode ^1.90.0`)                            | Extension runtime lifecycle and terminal management        |
+
+---
+
+## 4. Terms, Definitions & Acronyms
+
+| Term / Acronym          | Definition                                                                                                        |
+|:------------------------|:------------------------------------------------------------------------------------------------------------------|
+| **CLI**                 | *Command Line Interface*: The standalone terminal binary for OpenCode (`opencode`).                               |
+| **TUI**                 | *Terminal User Interface*: The interactive text-based interface presented by OpenCode v2 inside the terminal.     |
+| **Daemon / Service**    | Background headless process spawned by OpenCode v2 (`opencode service start`) exposing local HTTP/REST endpoints. |
+| **PTY**                 | *Pseudoterminal*: The underlying terminal device emulation managed by VS Code for interactive processes.          |
+| **VSIX**                | The standard packaging and distribution archive format for Visual Studio Code extensions.                         |
+| **IPC**                 | *Inter-Process Communication*: Protocols enabling the extension to communicate with editor windows and terminals. |
+| **Call Operator (`&`)** | PowerShell execution operator required to invoke strings or quoted paths as commands.                             |
+
+---
+
+## 5. Architectural Overview & Key Capabilities
+
 ```
-In **OpenCode v2.x**:
-- The `--port` flag at the root level no longer exists and causes launch failures (`unknown flag: --port`).
-- OpenCode v2 uses a background service architecture (`opencode service`) alongside direct interactive TUI sessions.
-- The binary is often installed in `~/.opencode/bin/opencode` and is not always included in the GUI editor's `$PATH`.
++-----------------------------------------------------------------+
+| Visual Studio Code / IDE                                    |
+|-------------------------------------------------------------|
+| +---------------------+             +---------------------+ |
+|                                                             |
+|                                                             |
+|                                                             |
+| +---------------------+                                     |
+|                                                             |
+|                                                             |
+| v                                   v                       |
+| +---------------------------------------------------------+ |
+|                                                             |
+|                                                             |
+|                                                             |
+| +---------------------------------------------------------+ |
++-----------------------------------------------------------------+
+                               |
+                               v
++-----------------------------------------------------------------+
+|               OpenCode v2 Daemon Service (Localhost)            |
+|   http://127.0.0.1:49374 (Web Dashboard & Management API)       |
++-----------------------------------------------------------------+
+```
 
-**OpenCode BLS** solves these issues:
-1. **100% Compatible with OpenCode v2.x**: Launches the CLI natively without invalid flags.
-2. **Smart Binary Resolution**: Automatically detects the executable in your `$PATH`, `~/.opencode/bin/opencode`, `~/.local/bin/opencode`, or via a custom configured path.
-3. **Preserves familiar shortcuts and workflows** (`Ctrl+Esc`, `@file#L...` line reference insertion, selection sending, etc.).
-4. **OpenCode v2 Web UI Integration**: Directly open the OpenCode v2 Web Dashboard from VS Code.
-5. **Configurable Terminal Location**: Choose between opening side-by-side (`beside`) or in the bottom panel (`panel`).
-6. **Backward Compatible with OpenCode v1.x**: Core terminal workflow and context piping work seamlessly across both v1 and v2, with graceful upgrade guidance for v2-exclusive features.
-7. **Robust Windows & PowerShell Support**: Native handling for PowerShell call operator (`&`), npm Windows wrappers (`.cmd`/`.exe` priority), and clean prompt startup without text pollution.
+1. **Native OpenCode v2 Execution**: Invokes OpenCode directly without legacy `--port` parameters that cause launch crashes.
+2. **Multi-Tiered Binary Auto-Detection**: Searches in user settings, standard installer paths (`~/.opencode/bin`), Homebrew (`/opt/homebrew/bin`), system bin paths, and system `$PATH`.
+3. **PowerShell & Windows First-Class Support**: Handles PowerShell quoted string execution via call operators (`&`), avoids npm extensionless bash wrappers, and prevents prompt text pollution.
+4. **Daemon & Web Dashboard Integration**: Inspects `opencode service status` and opens the web dashboard in the browser with one click.
+5. **Configurable Workspace Layout**: Supports side-by-side split editor (`beside`) and bottom terminal panel (`panel`).
+6. **OpenCode v1 Backward Compatibility**: Automatically detects v1 binaries and provides graceful upgrade guidance for v2-exclusive features.
 
-> For full technical details and debugging, see the [Troubleshooting & Migration Guide](TROUBLESHOOTING.md).
+> For exhaustive technical fault analysis and migration history, see the [Troubleshooting & Migration Guide](TROUBLESHOOTING.md).
 
 ---
 
-## ⌨️ Keybindings and Commands
+## 6. Command & Keybinding Reference
 
-| Command                                | Windows / Linux      | macOS               | Description                                                                        |
-|:---------------------------------------|:---------------------|:--------------------|:-----------------------------------------------------------------------------------|
-| **`opencode.openTerminal`**            | `Ctrl + Esc`         | `Cmd + Esc`         | Open or focus the active OpenCode terminal                                         |
-| **`opencode.openNewTerminal`**         | `Ctrl + Shift + Esc` | `Cmd + Shift + Esc` | Open a new OpenCode terminal tab                                                   |
-| **`opencode.addFilepathToTerminal`**   | `Ctrl + Alt + K`     | `Cmd + Alt + K`     | Insert active file and line selection reference (`@file#L10-20`) into the terminal |
-| **`opencode.sendSelectionToTerminal`** | `Ctrl + Alt + L`     | `Cmd + Alt + L`     | Send selected code directly to the OpenCode terminal                               |
-| **`opencode.openWebUI`**               | *(Command Palette)*  | *(Command Palette)* | Open the OpenCode v2 Web UI Dashboard                                              |
-| **`opencode.startService`**            | *(Command Palette)*  | *(Command Palette)* | Start the OpenCode v2 background daemon service                                    |
-
-Additionally:
-- **Editor Title Bar Button**: Quick action button to launch OpenCode right next to your editor.
-- **Status Bar Item**: Displays OpenCode status and detected version in the bottom status bar.
+| Command Identifier                     | Windows / Linux Keybinding |  macOS Keybinding   | Operational Description                                                        |
+|:---------------------------------------|:--------------------------:|:-------------------:|:-------------------------------------------------------------------------------|
+| **`opencode.openTerminal`**            |        `Ctrl + Esc`        |     `Cmd + Esc`     | Opens or focuses the active OpenCode terminal session.                         |
+| **`opencode.openNewTerminal`**         |    `Ctrl + Shift + Esc`    | `Cmd + Shift + Esc` | Forces creation of a new OpenCode terminal tab.                                |
+| **`opencode.addFilepathToTerminal`**   |      `Ctrl + Alt + K`      |   `Cmd + Alt + K`   | Injects relative file and line reference (`@path/file.ts#L10-25`) into prompt. |
+| **`opencode.sendSelectionToTerminal`** |      `Ctrl + Alt + L`      |   `Cmd + Alt + L`   | Pipes active editor code selection directly to the OpenCode session.           |
+| **`opencode.openWebUI`**               |    *(Command Palette)*     | *(Command Palette)* | Queries service status and launches the v2 Web Dashboard in browser.           |
+| **`opencode.startService`**            |    *(Command Palette)*     | *(Command Palette)* | Starts the OpenCode v2 background daemon service.                              |
 
 ---
 
-## ⚙️ Configuration (`settings.json`)
+## 7. Configuration Specification (`settings.json`)
 
-Customize the extension behavior in your VS Code settings:
+Configure extension behavior via user or workspace settings (`settings.json`):
 
 ```json
 {
-  // Custom path to the opencode binary (optional, if not in PATH or ~/.opencode/bin)
+  // Custom absolute path to the opencode executable. Leave empty for auto-detection.
   "opencode.executablePath": "",
 
-  // Terminal location: "beside" (side-by-side split editor) or "panel" (bottom panel)
+  // Terminal location: "beside" (side-by-side split editor) or "panel" (bottom panel).
   "opencode.terminalLocation": "beside",
 
-  // Extra CLI arguments to pass when starting the terminal (e.g. ["--auto"])
+  // Additional CLI arguments passed when launching OpenCode (e.g. ["--auto"]).
   "opencode.extraArgs": [],
 
-  // Web service URL if using a remote server or custom fixed port
+  // Explicit URL for the OpenCode v2 Web Dashboard. Auto-detected if empty.
   "opencode.webUrl": ""
 }
 ```
 
 ---
 
-## 🛠️ Development & Testing
+## 8. Operating Procedures (Task Workflows)
 
-### 1. Run in development (F5)
-1. Open this repository in VS Code / Antigravity IDE.
-2. Press **`F5`** (or run the `Launch Extension (F5)` task).
-3. A new Extension Development Host window will launch with the extension running.
+### Procedure 8.1: Running in Development Mode
+1. Open the repository root in VS Code or Antigravity IDE.
+2. Press **`F5`** (or execute the `Launch Extension (F5)` task).
+3. An **Extension Development Host** window opens with the live extension loaded.
 
-### 2. Build the `.vsix` package
-To build an installable package:
+### Procedure 8.2: Packaging into Installable VSIX
+To package the extension into an installable `.vsix` file:
 ```bash
 npm run build:vsix
 ```
-This will generate `opencode-bls-1.0.1.vsix` in the project root.
+*Expected Result*: Generates `opencode-bls-1.0.1.vsix` in the workspace root.
 
-### 3. Install the extension in your environment (Antigravity IDE / VS Code)
-
-**If using Antigravity IDE:**
-```bash
-antigravity-ide --install-extension opencode-bls-1.0.1.vsix
-```
-
-**If using standard VS Code:**
-```bash
-code --install-extension opencode-bls-1.0.1.vsix
-```
-
-Or via GUI:
-- Open the **Extensions** view (`Ctrl+Shift+X`).
-- Click the `...` menu in the top-right corner.
-- Select **"Install from VSIX..."** and choose `opencode-bls-1.0.1.vsix`.
-- Reload window (`Ctrl+Shift+P` -> `Developer: Reload Window`).
+### Procedure 8.3: Installing into Editor Environments
+* **Antigravity IDE**:
+  ```bash
+  antigravity-ide --install-extension opencode-bls-1.0.1.vsix
+  ```
+* **Visual Studio Code**:
+  ```bash
+  code --install-extension opencode-bls-1.0.1.vsix
+  ```
+* **Graphical Interface**:
+  1. Open the **Extensions** view (`Ctrl+Shift+X` / `Cmd+Shift+X`).
+  2. Click the `...` (More Actions) menu in the top right.
+  3. Select **Install from VSIX...** and select `opencode-bls-1.0.1.vsix`.
+  4. Reload window (`Ctrl+Shift+P` -> `Developer: Reload Window`).
 
 ---
 
-## 💻 Windows & PowerShell Considerations (For Developers)
+## 9. Cross-Platform & Shell Architecture Considerations
 
-When developing extensions or tools that interface with VS Code's integrated terminal on Windows, several critical shell-specific differences must be addressed:
+### 9.1 Windows & PowerShell Environments
+* **Quoted Path Execution**: When invoking executable paths with spaces in PowerShell, quoting the path (`"C:\path\to\opencode.cmd"`) treats it as a string literal and prints it to stdout instead of running it. OpenCode BLS automatically invokes `opencode` directly when present in `$PATH`, and prepends the call operator (`&`) for custom paths in PowerShell.
+* **npm Wrapper Resolution**: On Windows, npm creates three files in `%APPDATA%\npm`: an extensionless POSIX shell script, a `.cmd` batch file, and a `.ps1` script. OpenCode BLS prioritizes `.cmd` and `.exe` binaries over extensionless shell scripts.
+* **Prompt Cleanliness**: Terminal startup does not inject unrequested text strings, avoiding syntax errors and dirty command prompts.
 
-### 1. PowerShell Quoted Path Evaluation (`&` Call Operator)
-In standard Unix shells (`bash`, `zsh`) and Command Prompt (`cmd.exe`), invoking a quoted executable runs the program:
-```bash
-"C:\Program Files\OpenCode\opencode.exe"
-```
-In **PowerShell** (both Windows PowerShell 5.1 and PowerShell Core 7+ / `pwsh`), typing a quoted string evaluates it as a string literal and simply echoes the path back to the console:
-```powershell
-PS> "C:\Program Files\OpenCode\opencode.exe"
-C:\Program Files\OpenCode\opencode.exe   # ❌ Output string, did not execute!
-```
-To execute quoted commands or variables in PowerShell, the call operator `&` is required:
-```powershell
-PS> & "C:\Program Files\OpenCode\opencode.exe"  # ✅ Executes properly
-```
-*Solution*: **OpenCode BLS** invokes `opencode` directly when present in `$PATH` (cross-platform compatible across all shells), and dynamically detects PowerShell (`vscode.env.shell`) to prepend `&` when full quoted paths are used.
-
-### 2. Windows Executable Resolution with npm (`.cmd` / `.exe` vs Extensionless Scripts)
-When packages are installed globally via `npm install -g <pkg>`, npm generates three wrapper files in `%APPDATA%\npm`:
-* `pkg` — POSIX shell script without an extension (for Git Bash / Cygwin / MSYS2)
-* `pkg.cmd` — Windows Command Script (for `cmd.exe` and native Windows execution)
-* `pkg.ps1` — PowerShell Script
-
-Standard CLI searches on Windows like `where opencode` list the extensionless POSIX script first. Extensionless files cannot be launched natively by Windows shells without a bash interpreter.
-*Solution*: **OpenCode BLS** checks candidates and filters `where` results to prioritize `.cmd`, `.exe`, and `.bat` files on Windows.
-
-### 3. Clean Prompt Initialization
-Instead of blindly injecting context text into the terminal via `setTimeout`, the extension keeps the terminal launch prompt clean. Context references are only sent when explicitly triggered by the user via dedicated commands (`Ctrl+Alt+K` for `@file#L...` references).
+### 9.2 macOS & Linux Environments
+* **Apple Silicon Homebrew**: On macOS M-series chips, Homebrew installs to `/opt/homebrew/bin`. When launching GUI editors from macOS Finder or Dock, terminal rc files are not sourced, leaving `/opt/homebrew/bin` absent from GUI `$PATH`. OpenCode BLS explicitly probes `/opt/homebrew/bin` and user locations (`~/.opencode/bin`, `~/.local/bin`, `~/.bun/bin`).
+* **Path Separator Normalization**: Relative file references sent to the terminal are normalized with forward slashes (`/`), conforming to OpenCode CLI parsing standards on all platforms.
 
 ---
 
-## 📁 Project Structure
+## 10. Repository File Structure
 
 ```
 opencode-bls/
 ├── src/
-│   ├── extension.ts     # Extension entry point, command registration & status bar
-│   ├── terminal.ts      # Terminal management & @file#L... reference passing
-│   ├── binary.ts        # Detection and validation of the opencode v2 executable
+│   ├── extension.ts     # Extension entry point, command registration & status bar item
+│   ├── terminal.ts      # Terminal lifecycle, shell execution & @file reference insertion
+│   ├── binary.ts        # Cross-platform binary resolution & SemVer validation
 │   └── service.ts       # OpenCode v2 daemon service & Web UI integration
-├── images/              # Icons for light/dark themes and navigation button
-├── .vscode/
-│   ├── launch.json      # F5 debugging configuration
-│   └── tasks.json       # Background build task (esbuild)
-├── esbuild.js           # Fast bundling configuration
-├── package.json         # Extension manifest
-└── tsconfig.json        # TypeScript configuration
+├── images/              # Light and dark theme vector action icons
+├── .vscode/             # Development launch tasks and F5 configuration
+├── esbuild.js           # Production bundler configuration
+├── CHANGELOG.md         # ISO 8601 & Keep a Changelog revision history
+├── TROUBLESHOOTING.md   # Fault recovery & migration guide (ISO/IEC/IEEE 26514)
+├── package.json         # Extension manifest (bls-ve.opencode-bls)
+└── tsconfig.json        # TypeScript compiler options
 ```
 
 ---
 
-## 👤 Author
+## 11. Maintenance & Authorship
 
-**Francisco Prado** (Venezuela 🇻🇪)
-- GitHub: [@panchove](https://github.com/panchove)
-- Email: [fpradove@gmail.com](mailto:fpradove@gmail.com)
-
+* **Author:** Francisco Prado (BLS Venezuela 🇻🇪)
+* **Publisher Identifier:** `bls-ve`
+* **GitHub Repository:** [https://github.com/panchove/opencode-bls](https://github.com/panchove/opencode-bls)
+* **Email:** [fpradove@gmail.com](mailto:fpradove@gmail.com)
+* **License:** MIT License

@@ -1,6 +1,10 @@
-# Changelog
+# Changelog — OpenCode BLS
 
-All notable changes to the **OpenCode BLS** extension will be documented in this file.
+> **Document Identifier:** `DOC-BLS-CHANGELOG-001`  
+> **Applicable Standards:** ISO 8601 (*Date and time format YYYY-MM-DD*), SemVer 2.0.0, Keep a Changelog  
+> **Extension Identifier:** `bls-ve.opencode-bls`  
+
+All notable changes to the **OpenCode BLS** extension are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
