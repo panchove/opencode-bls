@@ -21,11 +21,11 @@ It provides detailed technical documentation on resolving incompatibilities intr
 
 In accordance with ISO/IEC 25010 reliability criteria, issues documented herein are classified according to operational severity:
 
-| Severity Level | Description | Impact |
-|:---|:---|:---|
-| **Critical** | Process termination or complete launch failure. | Prevents starting an interactive OpenCode session. |
-| **Major** | Shell or operating system incompatibility. | CLI fails to run on specific shell configurations (e.g. PowerShell). |
-| **Minor** | Graceful degradation or feature unavailability. | Feature restricted (e.g. Web UI on OpenCode v1) with informative guidance. |
+| Severity Level | Description                                     | Impact                                                                     |
+|:---------------|:------------------------------------------------|:---------------------------------------------------------------------------|
+| **Critical**   | Process termination or complete launch failure. | Prevents starting an interactive OpenCode session.                         |
+| **Major**      | Shell or operating system incompatibility.      | CLI fails to run on specific shell configurations (e.g. PowerShell).       |
+| **Minor**      | Graceful degradation or feature unavailability. | Feature restricted (e.g. Web UI on OpenCode v1) with informative guidance. |
 
 ---
 
@@ -170,14 +170,14 @@ Users need to reference active editor files and lines without manually copying p
 
 ### 4.1 Compatibility Matrix (ISO/IEC 25010)
 
-| Feature | OpenCode v1.x | OpenCode v2.x | Operational Behavior in OpenCode BLS |
-|:---|:---:|:---:|:---|
-| **Interactive Terminal (`Ctrl+Esc`)** | ✅ Supported | ✅ Supported | Runs `opencode` cleanly in terminal without deprecated `--port` flags. |
-| **Insert Reference (`@file#L...`)** | ✅ Supported | ✅ Supported | Fully compatible with prompt reference syntax and normalized `/` separators. |
-| **Send Code Selection** | ✅ Supported | ✅ Supported | Directly pipes selected editor text to terminal buffer. |
-| **Binary Auto-detection** | ✅ Supported | ✅ Supported | Scans settings, standard directories, Homebrew, and system `$PATH`. |
-| **Daemon Service (`opencode.startService`)** | ⚠️ v2-only | ✅ Supported | Displays informative notification with one-click **"Upgrade Guide"** action. |
-| **Web Dashboard (`opencode.openWebUI`)** | ⚠️ v2-only | ✅ Supported | Displays informative notification with one-click **"Upgrade Guide"** action. |
+| Feature                                      | OpenCode v1.x | OpenCode v2.x | Operational Behavior in OpenCode BLS                                         |
+|:---------------------------------------------|:-------------:|:-------------:|:-----------------------------------------------------------------------------|
+| **Interactive Terminal (`Ctrl+Esc`)**        |  ✅ Supported  |  ✅ Supported  | Runs `opencode` cleanly in terminal without deprecated `--port` flags.       |
+| **Insert Reference (`@file#L...`)**          |  ✅ Supported  |  ✅ Supported  | Fully compatible with prompt reference syntax and normalized `/` separators. |
+| **Send Code Selection**                      |  ✅ Supported  |  ✅ Supported  | Directly pipes selected editor text to terminal buffer.                      |
+| **Binary Auto-detection**                    |  ✅ Supported  |  ✅ Supported  | Scans settings, standard directories, Homebrew, and system `$PATH`.          |
+| **Daemon Service (`opencode.startService`)** |   ⚠️ v2-only   |  ✅ Supported  | Displays informative notification with one-click **"Upgrade Guide"** action. |
+| **Web Dashboard (`opencode.openWebUI`)**     |   ⚠️ v2-only   |  ✅ Supported  | Displays informative notification with one-click **"Upgrade Guide"** action. |
 
 ### 4.2 Graceful Fallback Strategy
 Instead of failing with shell errors when run against an OpenCode v1 installation, OpenCode BLS inspects the major version via SemVer regular expression parsing (`v?(\d+)\.`). If a v1 binary is detected and the user invokes a v2-exclusive service feature, an informative dialog is presented:
