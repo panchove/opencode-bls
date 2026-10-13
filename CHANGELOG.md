@@ -2,7 +2,7 @@
 
 > **Document Identifier:** `DOC-BLS-CHANGELOG-001`  
 > **Applicable Standards:** ISO 8601 (*Date and time format YYYY-MM-DD*), SemVer 2.0.0, Keep a Changelog  
-> **Extension Identifier:** `bls-ve.opencode-bls`  
+> **Extension Identifier:** `bls.opencode-bls`  
 
 All notable changes to the **OpenCode BLS** extension are documented in this file.
 

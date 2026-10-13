@@ -3,7 +3,7 @@
 > **Document Identifier:** `DOC-BLS-README-001`  
 > **Applicable Standard:** ISO/IEC/IEEE 26514:2018 (*Systems and software engineering — Requirements for designers and developers of user documentation*)  
 > **Software Target:** OpenCode BLS Extension for Visual Studio Code & Antigravity IDE  
-> **Extension Identifier:** `bls-ve.opencode-bls`  
+> **Extension Identifier:** `bls.opencode-bls`  
 > **Version:** `1.0.1` | **Release Date:** `2026-10-13` (ISO 8601)  
 > **Status:** Approved / Production  
 
@@ -11,7 +11,7 @@
 
 ## 1. Scope & Purpose
 
-This document provides user, operational, and reference documentation for **OpenCode BLS** (`bls-ve.opencode-bls`), an optimized Visual Studio Code extension engineered to seamlessly interface with the **OpenCode v2.x** and **OpenCode v1.x** AI agent CLI runtimes. 
+This document provides user, operational, and reference documentation for **OpenCode BLS** (`bls.opencode-bls`), an optimized Visual Studio Code extension engineered to seamlessly interface with the **OpenCode v2.x** and **OpenCode v1.x** AI agent CLI runtimes. 
 
 This extension supersedes the legacy `sst-dev.opencode` client by eliminating obsolete command-line parameters (`--port`), adding multi-platform binary resolution, integrating OpenCode v2 background daemon services, and ensuring zero-friction cross-platform shell compatibility.
 
@@ -196,7 +196,7 @@ opencode-bls/
 ├── esbuild.js           # Production bundler configuration
 ├── CHANGELOG.md         # ISO 8601 & Keep a Changelog revision history
 ├── TROUBLESHOOTING.md   # Fault recovery & migration guide (ISO/IEC/IEEE 26514)
-├── package.json         # Extension manifest (bls-ve.opencode-bls)
+├── package.json         # Extension manifest (bls.opencode-bls)
 └── tsconfig.json        # TypeScript compiler options
 ```
 
@@ -205,7 +205,7 @@ opencode-bls/
 ## 11. Maintenance & Authorship
 
 * **Author:** Francisco Prado (BLS Venezuela 🇻🇪)
-* **Publisher Identifier:** `bls-ve`
+* **Publisher Identifier:** `bls`
 * **GitHub Repository:** [https://github.com/panchove/opencode-bls](https://github.com/panchove/opencode-bls)
 * **Email:** [fpradove@gmail.com](mailto:fpradove@gmail.com)
 * **License:** MIT License

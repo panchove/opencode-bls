@@ -3,7 +3,7 @@
 > **Document Identifier:** `DOC-BLS-TROUBLESHOOTING-001`  
 > **Applicable Standard:** ISO/IEC/IEEE 26514:2018 Clause 9.3 (*Problem determination and recovery procedures*)  
 > **Software Target:** OpenCode BLS Extension for Visual Studio Code & Antigravity IDE  
-> **Extension Identifier:** `bls-ve.opencode-bls`  
+> **Extension Identifier:** `bls.opencode-bls`  
 > **Version:** `1.0.1` | **Release Date:** `2026-10-13` (ISO 8601)  
 > **Status:** Approved / Production  
 
@@ -11,7 +11,7 @@
 
 ## 1. Scope & Diagnostic Objective
 
-This document defines the technical fault analysis, root-cause diagnosis, error recovery procedures, and version migration specifications for **OpenCode BLS** (`bls-ve.opencode-bls`). 
+This document defines the technical fault analysis, root-cause diagnosis, error recovery procedures, and version migration specifications for **OpenCode BLS** (`bls.opencode-bls`). 
 
 It provides detailed technical documentation on resolving incompatibilities introduced by the legacy `sst-dev.opencode` extension, addressing operating system and shell quirks across Windows, macOS, and Linux, and ensuring reliable terminal session management.
 
